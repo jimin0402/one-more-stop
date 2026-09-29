@@ -1,18 +1,44 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from "expo-router";
+import { useEffect } from "react";
+import { Platform } from "react-native";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  useEffect(() => {
+    const setupRevenueCat = async () => {
+      try {
+        // RevenueCat debug logs
+        Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
-SplashScreen.preventAutoHideAsync();
+        // RevenueCat is only configured on iOS / Android
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+          Purchases.configure({
+            apiKey: "test_TDlUDxgcNbjSySbRSRqvwAkuXPi",
+          });
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+          console.log("RevenueCat configured successfully!");
+        }
+      } catch (error) {
+        console.log("RevenueCat configuration error:", error);
+      }
+    };
+
+    setupRevenueCat();
+  }, []);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",
+      }}
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="setup" />
+      <Stack.Screen name="mystery" />
+      <Stack.Screen name="journey" />
+      <Stack.Screen name="reveal" />
+      <Stack.Screen name="complete" />
+    </Stack>
   );
 }
